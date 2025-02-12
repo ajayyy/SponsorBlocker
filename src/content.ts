@@ -2576,6 +2576,8 @@ function hotkeyListener(e: KeyboardEvent): void {
     const openSubmissionMenuKey = Config.config.submitKeybind;
     const nextChapterKey = Config.config.nextChapterKeybind;
     const previousChapterKey = Config.config.previousChapterKeybind;
+    const upvoteKey = Config.config.upvoteKeybind;
+    const downvoteKey = Config.config.downvoteKeybind;
 
     if (keybindEquals(key, skipKey)) {
         if (activeSkipKeybindElement) {
@@ -2618,6 +2620,16 @@ function hotkeyListener(e: KeyboardEvent): void {
     } else if (keybindEquals(key, previousChapterKey)) {
         if (sponsorTimes.length > 0) e.stopPropagation();
         previousChapter();
+        return;
+    } else if (keybindEquals(key, upvoteKey)) {
+        const lastSegment = [...sponsorTimes].reverse()?.find((s) => s.segment[0] <= getCurrentTime() && getCurrentTime() - (s.segment[1] || s.segment[0]) <= Config.config.skipNoticeDuration);
+        const lastSkipNotice = skipNotices?.find((skipNotice) => skipNotice.segments.some((segment) => segment.UUID === lastSegment.UUID))?.skipNoticeRef.current;
+        if (lastSegment) vote(1,lastSegment.UUID, undefined, lastSkipNotice);
+        return;
+    } else if (keybindEquals(key, downvoteKey)) {
+        const lastSegment = [...sponsorTimes].reverse()?.find((s) => s.segment[0] <= getCurrentTime() && getCurrentTime() - (s.segment[1] || s.segment[0]) <= Config.config.skipNoticeDuration);
+        const lastSkipNotice = skipNotices?.find((skipNotice) => skipNotice.segments.some((segment) => segment.UUID === lastSegment.UUID))?.skipNoticeRef.current;
+        if (lastSegment) vote(0,lastSegment.UUID, undefined, lastSkipNotice);
         return;
     }
 }
